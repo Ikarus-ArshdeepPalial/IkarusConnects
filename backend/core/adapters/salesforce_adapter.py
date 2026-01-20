@@ -10,50 +10,73 @@ class SalesforceAdapter(BaseAdapter):
     
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
-        self.sf = None
         self.username = config.get("username")
         self.password = config.get("password")
-        self.security_token = config.get("security_token")
-        self.domain = config.get("domain", "login")
+        self.security_token = config.get("security_token", "")
         self.session_id = config.get("session_id")
         self.instance_url = config.get("instance_url")
+        # OAuth Credentials
+        self.client_id = config.get("client_id") # consumer_key
+        self.client_secret = config.get("client_secret") # consumer_secret
+        
         self.object_name = config.get("object_name")
+        self.domain = config.get("domain", "login")
+        self.client = None
 
     def authenticate(self) -> bool:
         try:
-            # Priority 1: Session ID (Bypasses SOAP Login)
             if self.session_id and self.instance_url:
-                self.sf = Salesforce(
+                # Legacy: Session ID
+                self.client = Salesforce(
                     instance_url=self.instance_url,
                     session_id=self.session_id
                 )
-                return True
-
-            # Priority 2: Username/Password (SOAP Login)
-            if not all([self.username, self.password, self.security_token]):
-                print("Salesforce credentials incomplete. Running in MOCK mode.")
+            elif self.username and self.password and self.client_id and self.client_secret:
+                # OAuth: Username-Password Flow (REST API)
+                import requests
+                
+                # Determine Login URL (Test vs Prod)
+                login_domain = self.domain if self.domain else "login"
+                if "test" in (self.instance_url or ""):
+                    login_domain = "test"
+                
+                token_url = f"https://{login_domain}.salesforce.com/services/oauth2/token"
+                
+                payload = {
+                    'grant_type': 'password',
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret,
+                    'username': self.username,
+                    'password': f"{self.password}{self.security_token}"
+                }
+                
+                response = requests.post(token_url, data=payload)
+                if response.status_code != 200:
+                    raise Exception(f"OAuth Error: {response.text}")
+                
+                data = response.json()
+                self.client = Salesforce(
+                    instance_url=data['instance_url'],
+                    session_id=data['access_token']
+                )
+            else:
+                print("[Mock] Salesforce credentials incomplete.")
                 return False
-
-            self.sf = Salesforce(
-                username=self.username, 
-                password=self.password, 
-                security_token=self.security_token,
-                domain=self.domain
-            )
+                
             return True
         except Exception as e:
-            print(f"Salesforce authentication failed: {e}")
+            print(f"Salesforce Auth Failed: {e}")
             raise
 
     def fetch_contacts(self) -> List[Contact]:
-        if not self.sf:
+        if not self.client:
             # Mock Data
             return [
                 Contact(id="MOCK_SF_1", first_name="Django", last_name="User", email="django@test.com")
             ]
 
         query = "SELECT Id, FirstName, LastName, Email, Phone FROM Contact LIMIT 10"
-        results = self.sf.query(query)
+        results = self.client.query(query)
         
         contacts = []
         for record in results['records']:
@@ -114,13 +137,13 @@ class SalesforceAdapter(BaseAdapter):
                 crm_field = field_mapping[key]
                 sf_contact[crm_field] = value
                 
-        if not self.sf:
+        if not self.client:
             print(f"[MOCK] Pushing to Salesforce: {sf_contact}")
             return "MOCK_SF_ID_123"
 
         try:
             # Dynamic Object Creation using getattr
-            sobject = getattr(self.sf, sobject_name)
+            sobject = getattr(self.client, sobject_name)
             result = sobject.create(sf_contact)
             return result['id']
         except Exception as e:
