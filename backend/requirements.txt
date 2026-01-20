@@ -7,6 +7,7 @@ celery==5.3.6
 certifi==2026.1.4
 cffi==2.0.0
 charset-normalizer==3.4.4
+channels==4.0.0
 click==8.3.1
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
@@ -54,4 +55,5 @@ vine==5.1.0
 wcwidth==0.2.14
 whitenoise==6.11.0
 zeep==4.3.2
+
 
