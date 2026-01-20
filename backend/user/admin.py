@@ -21,7 +21,6 @@ class UserAdmin(BaseUserAdmin):
                     "email",
                     "name",
                     "password",
-                    "prof_image",
                 )
             },
         ),
@@ -61,7 +60,6 @@ class UserAdmin(BaseUserAdmin):
                     "is_staff",
                     "is_superuser",
                     "private_account",
-                    "prof_image",
                 ),
             },
         ),
