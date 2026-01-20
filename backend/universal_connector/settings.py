@@ -43,11 +43,11 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    f"https://{env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])}",
+    env.list('CORSE_ALLOWED_ORIGINS'),
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    f"https://{env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])}",
+    env.list('CSRF_TRUSTED_ORIGINS'),
 ]
 
 
