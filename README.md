@@ -14,47 +14,6 @@ The definitive guide to connecting your business data. Ikarus Connects is a univ
 -   **Secure Authentication**: User management with JWT support.
 -   **Configurable**: Dynamic configuration for different CRM types.
 
-## Tech Stack
-
--   Python
--   Django & Django REST Framework
--   Celery (for background tasks)
--   PostgreSQL / SQLite
-
----
-
-## Getting Started
-
-### Prerequisites
-
--   Python 3.10+
--   pip
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <repository_url>
-    cd universal_connector
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3.  **Run Migrations:**
-    ```bash
-    python manage.py migrate
-    ```
-
-4.  **Start the Server:**
-    ```bash
-    python manage.py runserver
-    ```
-
----
-
 ## Authentication
 
 To use the API, you must first create an account and obtain an authentication token.
