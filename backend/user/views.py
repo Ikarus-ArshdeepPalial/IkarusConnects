@@ -12,6 +12,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -21,6 +23,7 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginUserView(TokenObtainPairView):
     """Login a user an return token"""
 
