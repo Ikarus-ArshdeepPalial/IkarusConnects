@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'rest_framework',
     'django.contrib.staticfiles',
-    'channels',
     'core',
     'api',
     'user',
@@ -60,7 +59,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://ikarusconnects.onrender.com',
 ]
-
 # Create a trust for the proxy (Render/Heroku/etc) to pass the protocol
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -102,16 +100,16 @@ WSGI_APPLICATION = 'universal_connector.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
-#     'default': env.db('DB_URL')
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
 # }
+
+DATABASES = {
+    'default': env.db('DB_URL')
+}
 
 
 # Password validation
@@ -190,3 +188,4 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=100),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365*10),
 }
+
