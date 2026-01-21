@@ -14,8 +14,8 @@ class DynamicsAdapter(BaseAdapter):
         self.client_id = config.get("client_id")
         self.client_secret = config.get("client_secret")
         self.tenant_id = config.get("tenant_id")
-        self.resource_url = config.get("resource_url") # e.g. https://org12345.crm.dynamics.com
-        self.object_type = config.get("object_type") # e.g. 'contacts', 'leads'
+        self.resource_url = config.get("resource_url")
+        self.object_type = config.get("object_type")
         self.field_mapping = config.get("field_mapping", {})
         self._access_token = None
 
@@ -43,7 +43,6 @@ class DynamicsAdapter(BaseAdapter):
         if not (self.client_id and self.client_secret and self.tenant_id and self.resource_url):
             print("[Mock] Dynamics credentials incomplete.")
             return False
-        # Ideally try to fetch token here to verify
         try:
             self._get_access_token()
             return True
@@ -64,7 +63,6 @@ class DynamicsAdapter(BaseAdapter):
              print(f"[MOCK] Pushing to Dynamics ({entity_set_name})")
              return "MOCK_DYN_GUID_123"
 
-        # Prepare Payload
         payload = {}
         flat_contact = contact.model_dump()
         flat_contact.update(contact.custom_fields)
@@ -83,25 +81,15 @@ class DynamicsAdapter(BaseAdapter):
             headers = {
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
-                "Prefer": "return=representation"  # Ask for created data back
+                "Prefer": "return=representation"
             }
             
             response = requests.post(url, json=payload, headers=headers)
             response.raise_for_status()
-            
-            # Dynamics returns the created entity with ID usually in 'contactid' or similar
-            # If 'return=representation' is honored, we get JSON.
-            # ID key often matches entity name + 'id', e.g. 'contactid', 'leadid'.
-            # We will try to scan for an ID-like field if specific one isn't clear, 
-            # or just return success if 201 Created.
             data = response.json()
-            
-            # Heuristic to find ID: usually e.g. contactid
-            # Or use header 'OData-EntityId' if available
             if 'OData-EntityId' in response.headers:
                  return response.headers['OData-EntityId']
             
-            # Return full data ID if found, otherwise generic success
             return str(data.get(f"{entity_set_name[:-1]}id", "CREATED"))
 
         except requests.exceptions.HTTPError as e:
