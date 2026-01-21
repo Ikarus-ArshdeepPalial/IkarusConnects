@@ -19,7 +19,6 @@ class HubSpotAdapter(BaseAdapter):
         if not self.access_token:
             print("HubSpot credentials incomplete. Running in MOCK mode.")
             return False
-        # Logic to verify token could go here (e.g. hitting an endpoint)
         return True
 
     def fetch_contacts(self) -> List[Contact]:
@@ -30,7 +29,6 @@ class HubSpotAdapter(BaseAdapter):
         return []
 
     def push_contact(self, contact: Contact, target: str = None) -> str:
-        # Determine Object Type: Argument (Priority) > Config (Priority 2)
         object_type = target if target else self.object_type
         if not object_type:
              raise ValueError("HubSpot Object Type not provided in Configuration.")
