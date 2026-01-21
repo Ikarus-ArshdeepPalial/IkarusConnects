@@ -16,8 +16,8 @@ class SalesforceAdapter(BaseAdapter):
         self.session_id = config.get("session_id")
         self.instance_url = config.get("instance_url")
         # OAuth Credentials
-        self.client_id = config.get("client_id") # consumer_key
-        self.client_secret = config.get("client_secret") # consumer_secret
+        self.client_id = config.get("client_id")
+        self.client_secret = config.get("client_secret")
         
         self.object_name = config.get("object_name")
         self.domain = config.get("domain", "login")
@@ -96,14 +96,12 @@ class SalesforceAdapter(BaseAdapter):
         if not sobject_name:
              raise ValueError("Salesforce Object Name not provided in URL or Config.")
         
-        # Build payload dynamically
         sf_contact = {}
         
         # Flatten contact data
         flat_contact = contact.model_dump()
         flat_contact.update(contact.custom_fields)
 
-        # Logic: Find which field is mapped to "LastName" (Required by Salesforce Contacts/Leads)
         field_mapping = self.config.get('field_mapping', {})
         lastname_key = None
         for key, crm_field in field_mapping.items():
@@ -111,17 +109,15 @@ class SalesforceAdapter(BaseAdapter):
                 lastname_key = key
                 break
         
-        # Resolve LastName (Strictly for Contact/Lead) or Generic Name Mappings
         if lastname_key and lastname_key in flat_contact:
              sf_contact['LastName'] = flat_contact[lastname_key]
         elif sobject_name in ['Contact', 'Lead']:
-            # For Standard Objects, LastName is mandatory
             if contact.last_name:
                 sf_contact['LastName'] = contact.last_name
             else:
                  sf_contact['LastName'] = "Unknown"
 
-        # Resolve First Name (Optional but good to have)
+        # Resolve First Name
         if contact.first_name:
             sf_contact['FirstName'] = contact.first_name
 
@@ -142,7 +138,6 @@ class SalesforceAdapter(BaseAdapter):
             return "MOCK_SF_ID_123"
 
         try:
-            # Dynamic Object Creation using getattr
             sobject = getattr(self.client, sobject_name)
             result = sobject.create(sf_contact)
             return result['id']
