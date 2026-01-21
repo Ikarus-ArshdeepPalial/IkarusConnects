@@ -16,12 +16,15 @@ from django.utils.timezone import now
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
+    
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
 
 class LoginUserView(TokenObtainPairView):
     """Login a user an return token"""
+
+    authentication_classes = []
     permission_classes = [permissions.AllowAny]
     serializer_class = GetTokenPairSerializer
 
