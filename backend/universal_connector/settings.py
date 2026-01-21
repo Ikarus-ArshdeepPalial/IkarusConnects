@@ -50,6 +50,8 @@ CSRF_TRUSTED_ORIGINS = [
     env('CSRF_TRUSTED_ORIGINS'),
 ]
 
+# Create a trust for the proxy (Render/Heroku/etc) to pass the protocol
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 AUTH_USER_MODEL = 'user.User'
 
