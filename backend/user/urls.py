@@ -10,13 +10,12 @@ from user.views import (
     ForgotPasswordUserChangeView,
     UpdateLastVisitView,
 )
-from django.views.decorators.csrf import csrf_exempt
 
 app_name = "user"
 
 urlpatterns = [
     path("signup/", CreateUserView.as_view(), name="signup"),
-    path("login/", csrf_exempt(LoginUserView.as_view()), name="login"),
+    path("login/", LoginUserView.as_view(), name="login"),
     path("token/refresh/", jwt_views.TokenRefreshView.as_view(), name="refresh"),
     path("manageuser/", UpdateUserView.as_view(), name="manageuser"),
     path("forgot/", ForgotPasswordUserView.as_view(), name="forgotpassword"),
