@@ -2,12 +2,9 @@
 
 from django.contrib.auth import authenticate
 from django.utils.timezone import now
-
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
-
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from user.serializer import (
@@ -29,7 +26,7 @@ class LoginUserView(APIView):
     Login user and return JWT tokens
     """
 
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
     def post(self, request):
