@@ -55,9 +55,8 @@ INSTALLED_APPS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Deployment Security Settings
 CSRF_TRUSTED_ORIGINS = [
-    'https://ikarusconnects.onrender.com',
+    env('CSRF_TRUSTED_ORIGINS'),
 ]
 # Create a trust for the proxy (Render/Heroku/etc) to pass the protocol
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
