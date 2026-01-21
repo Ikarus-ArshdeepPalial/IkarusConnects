@@ -19,7 +19,6 @@ class MondayAdapter(BaseAdapter):
         if not self.api_token or not self.board_id:
             print("Monday.com credentials incomplete. Running in MOCK mode.")
             return False
-        # Basic check to see if token is valid (optional, e.g. query users)
         return True
 
     def fetch_contacts(self) -> List[Contact]:
@@ -30,21 +29,14 @@ class MondayAdapter(BaseAdapter):
         return []
 
     def push_contact(self, contact: Contact, target: str = None) -> str:
-        # 1. Prepare Column Values
-        import json
-        
-        # Determine Board ID: Argument (Priority) > Config
+        import json        
         target_board_id = target if target else self.board_id
         if not target_board_id:
              raise ValueError("Monday Board ID not provided in URL or Config.")
 
         column_values = {}
-        
-        # Flatten contact data
         flat_contact = contact.model_dump()
         flat_contact.update(contact.custom_fields)
-        
-        # Logic: Find which field is mapped to "Name"
         name_field_key = None
         for key, monday_col in self.field_mapping.items():
             if monday_col == "Name":
@@ -62,7 +54,7 @@ class MondayAdapter(BaseAdapter):
         # Map everything else
         for key, value in flat_contact.items():
             if key == name_field_key: 
-                continue # Already used for Item Name
+                continue
             
             if key in ['id', 'created_at', 'updated_at', 'raw_data', 'custom_fields']:
                 continue
@@ -75,7 +67,7 @@ class MondayAdapter(BaseAdapter):
             print(f"[MOCK] Pushing to Monday Board {target_board_id}: {item_name}, Cols: {column_values}")
             return "MOCK_MON_ITEM_123"
 
-        # 2. GraphQL Mutation
+        # GraphQL Mutation
         query = """
         mutation ($board_id: ID!, $item_name: String!, $column_values: JSON!) {
             create_item (board_id: $board_id, item_name: $item_name, column_values: $column_values) {
