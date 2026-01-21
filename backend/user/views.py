@@ -13,23 +13,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 
-
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
     
-    authentication_classes = []
     permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class LoginUserView(TokenObtainPairView):
     """Login a user an return token"""
 
-    authentication_classes = []
     permission_classes = [permissions.AllowAny]
     serializer_class = GetTokenPairSerializer
 
