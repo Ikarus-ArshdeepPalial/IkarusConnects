@@ -13,7 +13,7 @@ class PipedriveAdapter(BaseAdapter):
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.api_token = config.get("api_token")
-        self.object_type = config.get("object_type") # e.g. 'persons', 'deals'
+        self.object_type = config.get("object_type")
         self.field_mapping = config.get("field_mapping", {})
 
     def authenticate(self) -> bool:
@@ -26,7 +26,6 @@ class PipedriveAdapter(BaseAdapter):
         return []
 
     def push_contact(self, contact: Contact, target: str = None) -> str:
-        # Pipedrive typically calls contacts 'persons'
         endpoint = target if target else self.object_type
         if not endpoint:
              raise ValueError("Pipedrive Object Type (e.g. 'persons') not provided in keys.")
@@ -59,7 +58,6 @@ class PipedriveAdapter(BaseAdapter):
             response = requests.post(url, params=params, json=payload)
             response.raise_for_status()
             data = response.json()
-            # Pipedrive response structure: { "success": true, "data": { "id": 123, ... } }
             return str(data.get('data', {}).get('id', 'UNKNOWN'))
             
         except requests.exceptions.HTTPError as e:
